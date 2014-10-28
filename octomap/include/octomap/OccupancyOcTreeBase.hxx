@@ -112,6 +112,21 @@ namespace octomap {
 
 
   template <class NODE>
+  void OccupancyOcTreeBase<NODE>::insertPointCloudStereo(const Pointcloud& scan, const octomap::point3d& sensor_origin,
+                                             double maxrange, double coeff) {
+
+    KeySet free_cells, occupied_cells;
+    computeUpdate(scan, sensor_origin, free_cells, occupied_cells, maxrange);
+
+    for (KeySet::iterator it = free_cells.begin(); it != free_cells.end(); ++it) {
+      updateNodeStereo(*it, false, coeff, sensor_origin);
+    }
+    for (KeySet::iterator it = occupied_cells.begin(); it != occupied_cells.end(); ++it) {
+      updateNodeStereo(*it, true, coeff, sensor_origin);
+    }
+  }
+
+  template <class NODE>
   void OccupancyOcTreeBase<NODE>::insertPointCloudRays(const Pointcloud& pc, const point3d& origin, double maxrange, bool lazy_eval) {
     if (pc.size() < 1)
       return;
@@ -360,6 +375,17 @@ namespace octomap {
     if (!this->coordToKeyChecked(x, y, z, key))
       return NULL;
     return updateNode(key, occupied, lazy_eval);
+  }
+
+  template <class NODE>
+  NODE* OccupancyOcTreeBase<NODE>::updateNodeStereo(const OcTreeKey& key, bool occupied, double coeff, const point3d& origin) {
+     point3d p = this->keyToCoord(key);
+     float d = (p-origin).norm();
+     float logOdds = this->prob_miss_log;
+     if (occupied)
+         logOdds = this->prob_hit_log;
+     logOdds *= erf(coeff/(d*d));
+     return updateNode(key, logOdds, false);
   }
 
   template <class NODE>
