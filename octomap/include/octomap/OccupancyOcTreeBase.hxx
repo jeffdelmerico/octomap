@@ -381,10 +381,13 @@ namespace octomap {
   NODE* OccupancyOcTreeBase<NODE>::updateNodeStereo(const OcTreeKey& key, bool occupied, double coeff, const point3d& origin) {
      point3d p = this->keyToCoord(key);
      float d = (p-origin).norm();
-     float logOdds = this->prob_miss_log;
+     float factor = erf(coeff/(d*d));
+     float prob = 0.5;
      if (occupied)
-         logOdds = this->prob_hit_log;
-     logOdds *= erf(coeff/(d*d));
+         prob += (probability(this->prob_hit_log) - 0.5) * factor;
+     else
+         prob += (probability(this->prob_miss_log) - 0.5) * factor;
+     float logOdds = logodds(prob);
      return updateNode(key, logOdds, false);
   }
 

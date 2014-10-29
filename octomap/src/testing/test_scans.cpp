@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
   //##############################################################     
 
-  bool use_stereo = false;
+  bool use_stereo = true;
   OcTree tree (0.1);
   tree.setOccupancyThres(0.55);
   tree.setStereoSensorModel(use_stereo);
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 
   for (int i=-100; i<101; i++) {
     for (int j=-100; j<101; j++) {
-      point3d p(1.0f,0.03*i,0.03*j);
+      point3d p(1.5f,0.03*i,0.03*j);
       cloud.push_back(p);
     }
   }

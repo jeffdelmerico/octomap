@@ -188,7 +188,7 @@ namespace octomap {
     void setOccupancyThres(double prob){occ_prob_thres_log = logodds(prob); }
     /// sets stereo (quadratic error) sensor model flag
     void setStereoSensorModel(bool stereoFlag){stereo_sensor_model = stereoFlag; }
-    /// sets coefficient for stereo sensor model: (C*(d_max)^2) / d^2
+    /// sets coefficient for stereo sensor model
     void setStereoErrorCoeff(double coeff){stereo_error_coeff = coeff; }
     /// sets the probability for a "hit" (will be converted to logodds) - sensor model
     void setProbHit(double prob){prob_hit_log = logodds(prob); assert(prob_hit_log >= 0.0);}

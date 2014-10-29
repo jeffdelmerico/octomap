@@ -143,7 +143,7 @@ namespace octomap {
     * @param scan Pointcloud (measurement endpoints), in global reference frame
     * @param sensor_origin measurement origin in global reference frame
     * @param maxrange maximum range for how long individual beams are inserted (default 5.0 m )
-    * @param coeff stereo error model coefficient: P_hit' = (P_hit * coeff) / d^2 (default = 1.0)
+    * @param coeff stereo error model coefficient
     */
     virtual void insertPointCloudStereo(const Pointcloud& scan, const octomap::point3d& sensor_origin, double maxrange = -1.0, double coeff = 1.0);
 
@@ -303,7 +303,7 @@ namespace octomap {
      *
      * @param key OcTreeKey of the NODE that is to be updated
      * @param occupied true if the node was measured occupied, else false
-     * @param coeff = stereo_error_coeff * maxrange * maxange
+     * @param coeff = stereo_error_coeff
      * @param origin = sensor origin in world frame
      * @return pointer to the updated NODE
      */
