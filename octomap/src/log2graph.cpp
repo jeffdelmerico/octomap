@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/octomap.h>
+#include <octomap_stereo/octomap.h>
 #include <string.h>
 #include <stdlib.h>
 
 using namespace std;
-using namespace octomap;
+using namespace octomap_stereo;
 
 void printUsage(char* self){
   std::cerr << "\nUSAGE: " << self << " InputFile.log OutputFile.graph\n\n";

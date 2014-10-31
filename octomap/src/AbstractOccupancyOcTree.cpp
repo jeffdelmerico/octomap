@@ -32,11 +32,11 @@
  */
 
 
-#include <octomap/AbstractOccupancyOcTree.h>
-#include <octomap/octomap_types.h>
+#include <octomap_stereo/AbstractOccupancyOcTree.h>
+#include <octomap_stereo/octomap_types.h>
 
 
-namespace octomap {
+namespace octomap_stereo {
   AbstractOccupancyOcTree::AbstractOccupancyOcTree(){
     // some sane default values:
     setOccupancyThres(0.5);   // = 0.0 in logodds

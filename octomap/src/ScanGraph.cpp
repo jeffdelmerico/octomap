@@ -36,10 +36,10 @@
 #include <sstream>
 #include <stdlib.h>
 
-#include <octomap/math/Pose6D.h>
-#include <octomap/ScanGraph.h>
+#include <octomap_stereo/math/Pose6D.h>
+#include <octomap_stereo/ScanGraph.h>
 
-namespace octomap {
+namespace octomap_stereo {
 
 
   ScanNode::~ScanNode(){

@@ -44,9 +44,9 @@
 #include <fstream>
 #include <math.h>
 
-#include <octomap/Pointcloud.h>
+#include <octomap_stereo/Pointcloud.h>
 
-namespace octomap {
+namespace octomap_stereo {
 
 
   Pointcloud::Pointcloud() {

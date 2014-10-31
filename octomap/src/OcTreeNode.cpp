@@ -37,9 +37,9 @@
 #include <fstream>
 #include <stdlib.h>
 
-#include <octomap/OcTreeNode.h>
+#include <octomap_stereo/OcTreeNode.h>
 
-namespace octomap {
+namespace octomap_stereo {
 
   OcTreeNode::OcTreeNode()
     : OcTreeDataNode<float>(0.0)

@@ -32,9 +32,9 @@
  */
 
 #include <cassert>
-#include <octomap/CountingOcTree.h>
+#include <octomap_stereo/CountingOcTree.h>
 
-namespace octomap {
+namespace octomap_stereo {
 
 
   /// implementation of CountingOcTreeNode  ----------------------------------

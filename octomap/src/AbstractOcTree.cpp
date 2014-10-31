@@ -32,12 +32,12 @@
  */
 
 
-#include <octomap/AbstractOcTree.h>
-#include <octomap/OcTree.h>
-#include <octomap/CountingOcTree.h>
+#include <octomap_stereo/AbstractOcTree.h>
+#include <octomap_stereo/OcTree.h>
+#include <octomap_stereo/CountingOcTree.h>
 
 
-namespace octomap {
+namespace octomap_stereo {
   AbstractOcTree::AbstractOcTree(){
 
   }

@@ -34,9 +34,9 @@
 
 #include <list>
 #include <queue>
-#include <octomap/OcTreeLUT.h>
+#include <octomap_stereo/OcTreeLUT.h>
 
-namespace octomap {
+namespace octomap_stereo {
 
 
   OcTreeLUT::OcTreeLUT(unsigned int _max_depth) :

@@ -31,10 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/OcTree.h>
+#include <octomap_stereo/OcTree.h>
 
 
-namespace octomap {
+namespace octomap_stereo {
 
   OcTree::OcTree(std::string _filename)
     : OccupancyOcTreeBase<OcTreeNode> (0.1)  { // resolution will be set according to tree file

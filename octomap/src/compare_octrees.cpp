@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/octomap.h>
+#include <octomap_stereo/octomap.h>
 #include <fstream>
 #include <iostream>
 #include <string.h>
@@ -46,7 +46,7 @@
 // on MacOS, isnan is in std (also C++11)
 using namespace std;
 
-using namespace octomap;
+using namespace octomap_stereo;
 
 void printUsage(char* self){
   std::cerr << "\nUSAGE: " << self << " tree1.ot tree2.ot\n\n";

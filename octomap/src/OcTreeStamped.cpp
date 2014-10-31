@@ -31,9 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "octomap/OcTreeStamped.h"
+#include "octomap_stereo/OcTreeStamped.h"
 
-namespace octomap {
+namespace octomap_stereo {
 
   unsigned int OcTreeStamped::getLastUpdateTime() {
     // this value is updated whenever inner nodes are 

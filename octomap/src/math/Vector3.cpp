@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/math/Vector3.h>
+#include <octomap_stereo/math/Vector3.h>
 #include <cassert>
 #include <math.h>
 #include <string.h>
 
-namespace octomath {
+namespace octomath{
 
   Vector3& Vector3::rotate_IP (double roll, double pitch, double yaw) {
     double x, y, z;

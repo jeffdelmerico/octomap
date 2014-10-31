@@ -31,9 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/math/Vector3.h>
-#include <octomap/math/Quaternion.h>
-#include <octomap/math/Utils.h>
+#include <octomap_stereo/math/Vector3.h>
+#include <octomap_stereo/math/Quaternion.h>
+#include <octomap_stereo/math/Utils.h>
 
 #include <cassert>
 #include <math.h>
@@ -41,7 +41,7 @@
 
 // used from Vector: norm2, unit, *
 
-namespace octomath {
+namespace octomath{
 
 
   Quaternion::Quaternion(const Quaternion &other) {

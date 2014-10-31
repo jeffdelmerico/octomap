@@ -31,10 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/math/Pose6D.h>
+#include <octomap_stereo/math/Pose6D.h>
 #include <math.h>
 
-namespace octomath {
+namespace octomath{
 
   Pose6D::Pose6D() {
   }

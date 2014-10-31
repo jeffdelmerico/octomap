@@ -49,12 +49,12 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <octomap/octomap.h>
+#include <octomap_stereo/octomap.h>
 #include <cstdlib>
 #include <cstring>
 
 using namespace std;
-using namespace octomap;
+using namespace octomap_stereo;
 
 typedef unsigned char byte;
 
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     double maxZ = 0.0;
     bool applyBBX = false;
     bool applyOffset = false;
-    octomap::point3d offset(0.0, 0.0, 0.0);
+    octomap_stereo::point3d offset(0.0, 0.0, 0.0);
     OcTree *tree = 0;
 
     if(argc == 1) show_help = true;

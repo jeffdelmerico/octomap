@@ -36,11 +36,11 @@
 #include <iostream>
 #include <fstream>
 
-#include <octomap/octomap.h>
-#include <octomap/octomap_timing.h>
+#include <octomap_stereo/octomap.h>
+#include <octomap_stereo/octomap_timing.h>
 
 using namespace std;
-using namespace octomap;
+using namespace octomap_stereo;
 
 void printUsage(char* self){
   std::cerr << "USAGE: " << self << " <InputFile.graph>\n";

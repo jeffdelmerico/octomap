@@ -31,9 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/ColorOcTree.h>
+#include <octomap_stereo/ColorOcTree.h>
 
-namespace octomap {
+namespace octomap_stereo {
 
 
   // node implementation  --------------------------------------

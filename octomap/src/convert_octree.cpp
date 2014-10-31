@@ -31,9 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <octomap/AbstractOcTree.h>
-#include <octomap/OcTree.h>
-#include <octomap/ColorOcTree.h>
+#include <octomap_stereo/AbstractOcTree.h>
+#include <octomap_stereo/OcTree.h>
+#include <octomap_stereo/ColorOcTree.h>
 #include <fstream>
 #include <iostream>
 #include <string.h>
@@ -41,7 +41,7 @@
 #include <list>
 
 using namespace std;
-using namespace octomap;
+using namespace octomap_stereo;
 
 void printUsage(char* self){
   std::cerr << "\nUSAGE: " << self << " input.(ot|bt|cot) [output.ot]\n\n";

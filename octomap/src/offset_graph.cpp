@@ -37,7 +37,7 @@
 #include <stdio.h>
 
 using namespace std;
-using namespace octomap;
+using namespace octomap_stereo;
 using namespace octomath;
 
 int main(int argc, char** argv) {

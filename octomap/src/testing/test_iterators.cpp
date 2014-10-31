@@ -318,10 +318,10 @@ int main(int argc, char** argv) {
   OcTreeKey bbxMinKey, bbxMaxKey;
   double temp_x,temp_y,temp_z;
   tree->getMetricMin(temp_x,temp_y,temp_z);
-  octomap::point3d bbxMin(temp_x,temp_y,temp_z);
+  octomap_stereo::point3d bbxMin(temp_x,temp_y,temp_z);
 
   tree->getMetricMax(temp_x,temp_y,temp_z);
-  octomap::point3d bbxMax(temp_x,temp_y,temp_z);
+  octomap_stereo::point3d bbxMax(temp_x,temp_y,temp_z);
 
   EXPECT_TRUE(tree->coordToKeyChecked(bbxMin, bbxMinKey));
   EXPECT_TRUE(tree->coordToKeyChecked(bbxMax, bbxMaxKey));

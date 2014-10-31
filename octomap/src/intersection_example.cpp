@@ -34,11 +34,11 @@
 #include <vector>
 #include <string>
 
-#include <octomap/octomap.h>
-#include <octomap/OcTree.h>
+#include <octomap_stereo/octomap.h>
+#include <octomap_stereo/OcTree.h>
 
 using namespace std;
-using namespace octomap;
+using namespace octomap_stereo;
 
 int main(int argc, char** argv) {
 
