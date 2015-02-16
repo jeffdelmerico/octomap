@@ -380,7 +380,8 @@ namespace octomap {
   template <class NODE>
   NODE* OccupancyOcTreeBase<NODE>::updateNodeStereo(const OcTreeKey& key, bool occupied, double coeff, const point3d& origin) {
      point3d p = this->keyToCoord(key);
-     float d = (p-origin).norm();
+     //float d = (p-origin).norm(); // TODO: maybe this should be p.z-origin.z?
+     float d = p.z() - origin.z();
      float factor = erf(coeff/(d*d));
      float prob = 0.5;
      if (occupied)
