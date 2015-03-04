@@ -110,22 +110,6 @@ namespace octomap {
     insertPointCloud(transformed_scan, transformed_sensor_origin, maxrange, lazy_eval, discretize);
   }
 
-
-  template <class NODE>
-  void OccupancyOcTreeBase<NODE>::insertPointCloudStereo(const Pointcloud& scan, const octomap::point3d& sensor_origin,
-                                             double maxrange, double coeff) {
-
-    KeySet free_cells, occupied_cells;
-    computeUpdate(scan, sensor_origin, free_cells, occupied_cells, maxrange);
-
-    for (KeySet::iterator it = free_cells.begin(); it != free_cells.end(); ++it) {
-      updateNodeStereo(*it, false, coeff, sensor_origin);
-    }
-    for (KeySet::iterator it = occupied_cells.begin(); it != occupied_cells.end(); ++it) {
-      updateNodeStereo(*it, true, coeff, sensor_origin);
-    }
-  }
-
   template <class NODE>
   void OccupancyOcTreeBase<NODE>::insertPointCloudRays(const Pointcloud& pc, const point3d& origin, double maxrange, bool lazy_eval) {
     if (pc.size() < 1)
@@ -375,21 +359,6 @@ namespace octomap {
     if (!this->coordToKeyChecked(x, y, z, key))
       return NULL;
     return updateNode(key, occupied, lazy_eval);
-  }
-
-  template <class NODE>
-  NODE* OccupancyOcTreeBase<NODE>::updateNodeStereo(const OcTreeKey& key, bool occupied, double coeff, const point3d& origin) {
-     point3d p = this->keyToCoord(key);
-     //float d = (p-origin).norm(); // TODO: maybe this should be p.z-origin.z?
-     float d = p.z() - origin.z();
-     float factor = erf(coeff/(d*d));
-     float prob = 0.5;
-     if (occupied)
-         prob += (probability(this->prob_hit_log) - 0.5) * factor;
-     else
-         prob += (probability(this->prob_miss_log) - 0.5) * factor;
-     float logOdds = logodds(prob);
-     return updateNode(key, logOdds, false);
   }
 
   template <class NODE>

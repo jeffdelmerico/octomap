@@ -9,6 +9,7 @@ SET (octomap_SRCS
   OcTreeStamped.cpp
   OcTreeLUT.cpp
   ColorOcTree.cpp
+  OcTreeStereo.cpp
   )
 
 # dynamic and static libs, see CMake FAQ:

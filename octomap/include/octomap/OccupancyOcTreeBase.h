@@ -131,22 +131,6 @@ namespace octomap {
     */
     virtual void insertPointCloud(const ScanNode& scan, double maxrange=-1., bool lazy_eval = false, bool discretize = false);
 
-    /**
-    * Integrate a Pointcloud (in global reference frame), parallelized with OpenMP.
-    * Special care is taken that each voxel
-    * in the map is updated only once, and occupied nodes have a preference over free ones.
-    * This avoids holes in the floor from mutual deletion and is more efficient than the plain
-    * ray insertion in insertPointCloudRays().
-    *
-    * @note replaces insertScan()
-    *
-    * @param scan Pointcloud (measurement endpoints), in global reference frame
-    * @param sensor_origin measurement origin in global reference frame
-    * @param maxrange maximum range for how long individual beams are inserted (default 5.0 m )
-    * @param coeff stereo error model coefficient
-    */
-    virtual void insertPointCloudStereo(const Pointcloud& scan, const octomap::point3d& sensor_origin, double maxrange = -1.0, double coeff = 1.0);
-
     /// @note Deprecated, use insertPointCloud() instead. pruning is now done automatically.
     OCTOMAP_DEPRECATED(virtual void insertScan(const Pointcloud& scan, const octomap::point3d& sensor_origin,
                    double maxrange=-1., bool pruning=true, bool lazy_eval = false))
@@ -297,17 +281,6 @@ namespace octomap {
      * @return pointer to the updated NODE
      */
     virtual NODE* updateNode(double x, double y, double z, bool occupied, bool lazy_eval = false);
-
-    /**
-     * Integrate occupancy measurement.
-     *
-     * @param key OcTreeKey of the NODE that is to be updated
-     * @param occupied true if the node was measured occupied, else false
-     * @param coeff = stereo_error_coeff
-     * @param origin = sensor origin in world frame
-     * @return pointer to the updated NODE
-     */
-    virtual NODE* updateNodeStereo(const OcTreeKey& key, bool occupied, double coeff, const point3d& origin);
 
     /**
      * Creates the maximum likelihood map by calling toMaxLikelihood on all
@@ -544,7 +517,6 @@ namespace octomap {
     /// Set of leaf keys (lowest level) which changed since last resetChangeDetection
     KeyBoolMap changed_keys;
     
-
   };
 
 } // namespace
