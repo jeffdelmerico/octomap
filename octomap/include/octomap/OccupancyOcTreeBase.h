@@ -282,7 +282,6 @@ namespace octomap {
      */
     virtual NODE* updateNode(double x, double y, double z, bool occupied, bool lazy_eval = false);
 
-
     /**
      * Creates the maximum likelihood map by calling toMaxLikelihood on all
      * tree nodes, setting their occupancy to the corresponding occupancy thresholds.
@@ -518,7 +517,6 @@ namespace octomap {
     /// Set of leaf keys (lowest level) which changed since last resetChangeDetection
     KeyBoolMap changed_keys;
     
-
   };
 
 } // namespace

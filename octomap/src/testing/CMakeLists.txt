@@ -29,6 +29,9 @@ TARGET_LINK_LIBRARIES(test_mapcollection octomap octomath)
 ADD_EXECUTABLE(test_pruning test_pruning.cpp)
 TARGET_LINK_LIBRARIES(test_pruning octomap octomath)
 
+ADD_EXECUTABLE(test_stereo test_stereo.cpp)
+TARGET_LINK_LIBRARIES(test_stereo octomap)
+
 
 # CTest tests below
 

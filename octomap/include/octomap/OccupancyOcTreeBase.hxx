@@ -110,7 +110,6 @@ namespace octomap {
     insertPointCloud(transformed_scan, transformed_sensor_origin, maxrange, lazy_eval, discretize);
   }
 
-
   template <class NODE>
   void OccupancyOcTreeBase<NODE>::insertPointCloudRays(const Pointcloud& pc, const point3d& origin, double maxrange, bool lazy_eval) {
     if (pc.size() < 1)

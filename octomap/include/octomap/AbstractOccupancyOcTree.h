@@ -186,6 +186,10 @@ namespace octomap {
 
     /// sets the threshold for occupancy (sensor model)
     void setOccupancyThres(double prob){occ_prob_thres_log = logodds(prob); }
+    /// sets stereo (quadratic error) sensor model flag
+    void setStereoSensorModel(bool stereoFlag){stereo_sensor_model = stereoFlag; }
+    /// sets coefficient for stereo sensor model
+    void setStereoErrorCoeff(double coeff){stereo_error_coeff = coeff; }
     /// sets the probability for a "hit" (will be converted to logodds) - sensor model
     void setProbHit(double prob){prob_hit_log = logodds(prob); assert(prob_hit_log >= 0.0);}
     /// sets the probability for a "miss" (will be converted to logodds) - sensor model
@@ -218,6 +222,10 @@ namespace octomap {
     /// @return maximum threshold for occupancy clamping in the sensor model (logodds)
     float getClampingThresMaxLog() const {return clamping_thres_max; }
 
+    /// gets the stereo sensor model flag
+    bool getStereoSensorModel() const {return stereo_sensor_model; }
+    /// gets the stereo error coefficient
+    float getStereoErrorCoeff() const {return stereo_error_coeff; }
 
 
 
@@ -231,6 +239,10 @@ namespace octomap {
     float prob_hit_log;
     float prob_miss_log;
     float occ_prob_thres_log;
+
+    // Parameters for stereo error model
+    bool stereo_sensor_model;
+    float stereo_error_coeff;
 
     static const std::string binaryFileHeader;
   };

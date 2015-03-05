@@ -31,9 +31,60 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "octomap_types.h"
-#include "Pointcloud.h"
-#include "ScanGraph.h"
-#include "OcTree.h"
-#include "OcTreeStereo.h"
+#ifndef OCTOMAP_OCTREE_STEREO_H
+#define OCTOMAP_OCTREE_STEREO_H
 
+
+#include "OccupancyOcTreeStereo.h"
+#include "OcTreeNode.h"
+#include "ScanGraph.h"
+
+namespace octomap {
+
+  /**
+   * octomap main map data structure, stores 3D occupancy grid map in an OcTree.
+   * Basic functionality is implemented in OcTreeBase.
+   *
+   */
+  class OcTreeStereo : public OccupancyOcTreeStereo <OcTreeNode> {
+
+  public:
+    /// Default constructor, sets resolution of leafs
+    OcTreeStereo(double resolution, double coeff, double max_range) 
+      : OccupancyOcTreeStereo<OcTreeNode>(resolution, coeff, max_range) {};
+
+    /**
+     * Reads an OcTree from a binary file 
+    * @param _filename
+     *
+     */
+    OcTreeStereo(std::string _filename);
+
+    virtual ~OcTreeStereo(){};
+
+    /// virtual constructor: creates a new object of same type
+    /// (Covariant return type requires an up-to-date compiler)
+    OcTreeStereo* create() const {return new OcTreeStereo(this->resolution,this->coefficient, this->maximum_range); }
+
+    std::string getTreeType() const {return "OcTreeStereo";}
+
+
+  protected:
+    /**
+     * Static member object which ensures that this OcTree's prototype
+     * ends up in the classIDMapping only once
+     */
+    class StaticMemberInitializer{
+    public:
+      StaticMemberInitializer() {
+        OcTreeStereo* tree = new OcTreeStereo(0.1, 1.0, 1.0);
+        AbstractOcTree::registerTreeType(tree);
+      }
+    };
+    /// to ensure static initialization (only once)
+    static StaticMemberInitializer ocTreeMemberInit;
+  };
+
+} // end namespace
+
+#endif

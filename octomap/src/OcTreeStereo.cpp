@@ -31,9 +31,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "octomap_types.h"
-#include "Pointcloud.h"
-#include "ScanGraph.h"
-#include "OcTree.h"
-#include "OcTreeStereo.h"
+#include <octomap/OcTreeStereo.h>
 
+
+namespace octomap {
+
+  OcTreeStereo::OcTreeStereo(std::string _filename)
+    : OccupancyOcTreeStereo<OcTreeNode> (0.1, 1.0, 1.0)  { // resolution will be set according to tree file
+    readBinary(_filename);
+  }
+
+  OcTreeStereo::StaticMemberInitializer OcTreeStereo::ocTreeMemberInit;
+
+  
+
+
+} // namespace
