@@ -2,9 +2,8 @@
 
 namespace octomap {
 
-  /*
   // node implementation  --------------------------------------
-  std::ostream& ColorOcTreeNode::writeValue (std::ostream &s) const {
+  std::ostream& TextureOcTreeNode::writeValue (std::ostream &s) const {
     // 1 bit for each children; 0: empty, 1: allocated
     std::bitset<8> children;
     for (unsigned int i=0; i<8; i++) {
@@ -15,7 +14,9 @@ namespace octomap {
     
     // write node data
     s.write((const char*) &value, sizeof(value)); // occupancy
-    s.write((const char*) &color, sizeof(Color)); // color
+    // write face data
+    for (auto it = faces.begin(); it!= faces.end(); it++)
+      s.write((const char*) it, sizeof(Face)); // Faces
     s.write((char*)&children_char, sizeof(char)); // child existence
 
     // write existing children
@@ -24,11 +25,13 @@ namespace octomap {
     return s;
   }
 
-  std::istream& ColorOcTreeNode::readValue (std::istream &s) {
+  std::istream& TextureOcTreeNode::readValue (std::istream &s) {
     // read node data
     char children_char;
     s.read((char*) &value, sizeof(value)); // occupancy
-    s.read((char*) &color, sizeof(Color)); // color
+    // write face data
+    for (auto it = faces.begin(); it!= faces.end(); it++)
+      s.read((char*) it, sizeof(Face)); // Faces
     s.read((char*)&children_char, sizeof(char)); // child existence
 
     // read existing children
@@ -42,6 +45,7 @@ namespace octomap {
     return s;
   }
 
+  /*
   ColorOcTreeNode::Color ColorOcTreeNode::getAverageChildColor() const {
     int mr(0), mg(0), mb(0);
     int c(0);
@@ -63,21 +67,23 @@ namespace octomap {
       return Color(255, 255, 255);
     }
   }
+  */
 
-
-  void ColorOcTreeNode::updateColorChildren() {      
-    color = getAverageChildColor();
+  void TextureOcTreeNode::updateTextureFromChildren() {      
+    for (auto it = faces.begin(); it != faces.end(); it++)
+      if (it->nObs > 0) *it = getAverageChildTexture();
   }
+  
 
   // pruning =============
 
-  bool ColorOcTreeNode::pruneNode() {
-    // checks for equal occupancy only, color ignored
+  bool TextureOcTreeNode::pruneNode() {
+    // checks for equal occupancy only, texture ignored
     if (!this->collapsible()) return false;
     // set occupancy value 
     setLogOdds(getChild(0)->getLogOdds());
-    // set color to average color
-    if (isColorSet()) color = getAverageChildColor();
+    // set face textures to average child face textures 
+    updateTextureFromChildren();
     // delete children
     for (unsigned int i=0;i<8;i++) {
       delete children[i];
@@ -87,15 +93,18 @@ namespace octomap {
     return true;
   }
 
-  void ColorOcTreeNode::expandNode() {
+  void TextureOcTreeNode::expandNode() {
     assert(!hasChildren());
     for (unsigned int k=0; k<8; k++) {
       createChild(k);
       children[k]->setValue(value);
-      getChild(k)->setColor(color);
+      for (auto i :W 
+        getChild(k)->setFace(i,faces.at(i));
     }
   }
 
+
+  /*
   // tree implementation  --------------------------------------
 
   ColorOcTreeNode* ColorOcTree::setNodeColor(const OcTreeKey& key, 

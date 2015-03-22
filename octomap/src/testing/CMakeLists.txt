@@ -32,6 +32,9 @@ TARGET_LINK_LIBRARIES(test_pruning octomap octomath)
 ADD_EXECUTABLE(test_stereo test_stereo.cpp)
 TARGET_LINK_LIBRARIES(test_stereo octomap)
 
+ADD_EXECUTABLE(test_texture_tree test_texture_tree.cpp)
+TARGET_LINK_LIBRARIES(test_texture_tree octomap)
+
 
 # CTest tests below
 

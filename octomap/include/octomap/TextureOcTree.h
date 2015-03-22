@@ -5,13 +5,13 @@
 #include <iostream>
 #include <array>
 #include <octomap/OcTreeNode.h>
-#include <octomap/OccupancyOcTreeBase.h>
+#include <octomap/OccupancyOcTreeStereo.h>
 
 namespace octomap {
   
   class Face {
   public:
-    Face() : value(255), nObs(0) {}
+    Face() : value(0), nObs(0) {}
     Face(unsigned char _value, unsigned int _nObs)
       : value(_value), nObs(_nObs) {}
     inline bool operator== (const Face &other) const {
@@ -62,7 +62,7 @@ namespace octomap {
     inline void addObservation(FaceEnum fe, unsigned char val) { faces.at(fe).addObservation(val); }
     inline void setFace(FaceEnum fe, Face f) { faces.at(fe) = f; }
 
-    // has any color been integrated? (pure white is very unlikely...)
+    // have any observations been integrated?
     inline bool observed(FaceEnum fe) const { 
       return (bool) faces.at(fe).nObs;
     }
@@ -81,15 +81,17 @@ namespace octomap {
 
 
   // tree definition
-  class TextureOcTree : public OccupancyOcTreeBase <TextureOcTreeNode> {
+  class TextureOcTree : public OccupancyOcTreeStereo <TextureOcTreeNode> {
 
   public:
     /// Default constructor, sets resolution of leafs
-    TextureOcTree(double resolution) : OccupancyOcTreeBase<TextureOcTreeNode>(resolution) {};  
+    TextureOcTree(double resolution, double coeff, double max_range) 
+      : OccupancyOcTreeStereo<TextureOcTreeNode>(resolution,coeff,max_range) {};  
+    virtual ~TextureOcTree();
       
     /// virtual constructor: creates a new object of same type
     /// (Covariant return type requires an up-to-date compiler)
-    TextureOcTree* create() const {return new TextureOcTree(resolution); }
+    TextureOcTree* create() const {return new TextureOcTree(resolution,coefficient,maximum_range); }
 
     std::string getTreeType() const {return "TextureOcTree";}
    
@@ -112,6 +114,16 @@ namespace octomap {
       return integrateFaceObservation(key, fe, val);
     }
 
+    // Look up a face texture
+    unsigned char getNodeTexture(const OcTreeKey& key, const FaceEnum& fe) const {
+      return search(key).getFace(fe);
+    }
+    unsigned char getNodeTexture(const float& x, const float& y, const float& z, const FaceEnum& fe) const {
+      OcTreeKey key;
+      if (!this->coordToKeyChecked(point3d(x,y,z), key)) return 0;
+      return getNodeTexture(key, fe);
+    }
+
     // update inner nodes, sets color to average child color
     void updateInnerOccupancy();
 
@@ -128,7 +140,7 @@ namespace octomap {
     class StaticMemberInitializer{
        public:
          StaticMemberInitializer() {
-           TextureOcTree* tree = new TextureOcTree(0.1);
+           TextureOcTree* tree = new TextureOcTree(0.1,10.0,15.0);
            AbstractOcTree::registerTreeType(tree);
          }
     };

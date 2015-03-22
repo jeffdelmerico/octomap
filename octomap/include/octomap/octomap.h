@@ -36,4 +36,5 @@
 #include "ScanGraph.h"
 #include "OcTree.h"
 #include "OcTreeStereo.h"
+#include "TextureOcTree.h"
 
