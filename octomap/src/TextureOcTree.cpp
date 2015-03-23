@@ -209,12 +209,84 @@ namespace octomap {
   }
 
 
+  // point insertion  --------------------------------------
+
+  void TextureOcTree::insertTexturePoint(const octomap::point3d& point,
+                                         const unsigned char& intensity,
+                                         const octomap::point3d& sensor_origin) {
+    
+    // Compute unit vector in the ray direction
+    const octomath::Vector3 direction = (point - sensor_origin).normalize();
+    
+    // Compute key for leaf voxel that point lies inside
+    OcTreeKey key;
+    if (!this->coordToKeyChecked(point, key)) return;
+    
+    // Compute intersection point with voxel    
+    point3d intersection;
+    point3d center = this->keyToCoord(key);
+    bool success = this->getRayIntersection(sensor_origin,direction,center,intersection);
+
+    // Add observation to side it hits first
+    if(success)
+    {
+      float dmin = std::numeric_limits<float>::max();
+      FaceEnum fe;
+      float d = 0.0;
+      
+      // x+
+      d = fabs((center.x() + resolution/2.0) - intersection.x());
+      if( d < dmin )
+      {
+        dmin = d;
+        fe = FaceEnum::xplus;
+      }
+      // x-
+      d = fabs((center.x() - resolution/2.0) - intersection.x());
+      if( d < dmin )
+      {
+        dmin = d;
+        fe = FaceEnum::xminus;
+      }
+      // y+
+      d = fabs((center.y() + resolution/2.0) - intersection.y());
+      if( d < dmin )
+      {
+        dmin = d;
+        fe = FaceEnum::yplus;
+      }
+      // y-
+      d = fabs((center.y() - resolution/2.0) - intersection.y());
+      if( d < dmin )
+      {
+        dmin = d;
+        fe = FaceEnum::yminus;
+      }
+      // z+
+      d = fabs((center.z() + resolution/2.0) - intersection.z());
+      if( d < dmin )
+      {
+        dmin = d;
+        fe = FaceEnum::zplus;
+      }
+      // z-
+      d = fabs((center.z() - resolution/2.0) - intersection.z());
+      if( d < dmin )
+      {
+        dmin = d;
+        fe = FaceEnum::zminus;
+      }
+      
+      integrateFaceObservation(key,fe,intensity);
+    }
+  }
+
   void TextureOcTree::insertPointCloud(const Pointcloud& scan, 
                         const std::vector<unsigned char>& intensities,
                         const octomap::point3d& sensor_origin,
                         const octomath::Vector3& sensor_orientation, 
-                        double maxrange, bool lazy_eval, bool discretize)
-  {
+                        double maxrange, bool lazy_eval, bool discretize) {
+
     // First update occupancies
     OccupancyOcTreeStereo::insertPointCloud(scan,sensor_origin,sensor_orientation,maxrange,lazy_eval,discretize);
     // For each point, compute the face that it intersects for the voxel it resides in
@@ -222,8 +294,22 @@ namespace octomap {
 
     // First, verify that we have the same number of intensities as points
     if (scan.size() != intensities.size())
+    {
       std::cerr << "Could not insert the point cloud: " << scan.size() << " points and " << intensities.size() << " intensities." << std::endl;
+      return;
+    }
+    else if(scan.size() < 1)
+      return;
 
+    // Next process each point
+#ifdef _OPENMP
+    omp_set_num_threads(this->keyrays.size());
+    #pragma omp parallel for
+#endif
+    for (int i = 0; i < (int)scan.size(); ++i) {
+      const point3d& p = scan[i];
+      insertTexturePoint(p,intensities.at(i),sensor_origin);
+    }
   }
     
 

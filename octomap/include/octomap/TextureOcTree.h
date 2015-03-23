@@ -149,7 +149,10 @@ namespace octomap {
     // Print texture at a node to a stream
     void printNodeTexture(const OcTreeKey& key) const {
       TextureOcTreeNode* n = this->search(key);
-      std::cout << (TextureOcTreeNode *) n;
+      if (n)
+        std::cout << (TextureOcTreeNode *) n;
+      else
+        std::cout << "This voxel has not been observed." << std::endl;
     }
     void printNodeTexture(const float& x, const float& y, const float& z) const {
       OcTreeKey key;
@@ -164,12 +167,17 @@ namespace octomap {
     // uses gnuplot to plot a RGB histogram in EPS format
     void writeTextureHistogram(std::string filename);
 
+    void insertTexturePoint(const octomap::point3d& point,
+                            const unsigned char& intensity,
+                            const octomap::point3d& sensor_origin);
+
     // Insert a cloud of points with intensities
     void insertPointCloud(const Pointcloud& scan, 
                           const std::vector<unsigned char>& intensities,
                           const octomap::point3d& sensor_origin,
                           const octomath::Vector3& sensor_orientation, 
-                          double maxrange, bool lazy_eval, bool discretize);
+                          double maxrange = -1.0f, bool lazy_eval = false, 
+                          bool discretize = false);
     
   protected:
     void updateInnerOccupancyRecurs(TextureOcTreeNode* node, unsigned int depth);
