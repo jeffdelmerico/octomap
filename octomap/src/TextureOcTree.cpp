@@ -45,33 +45,23 @@ namespace octomap {
     return s;
   }
 
-  /*
-  ColorOcTreeNode::Color ColorOcTreeNode::getAverageChildColor() const {
-    int mr(0), mg(0), mb(0);
-    int c(0);
+  Face TextureOcTreeNode::getAverageChildTexture(FaceEnum fe) const {
+    int val(0);
+    int obs(0);
     for (int i=0; i<8; i++) {
-      if (childExists(i) && getChild(i)->isColorSet()) {
-        mr += getChild(i)->getColor().r;
-        mg += getChild(i)->getColor().g;
-        mb += getChild(i)->getColor().b;
-        ++c;
+      if (childExists(i) && getChild(i)->observed(fe)) {
+        unsigned int nObs = getChild(i)->getFaceObservations(fe);
+        val += (getChild(i)->getFaceValue(fe) * nObs);
+        obs += nObs;
       }
     }
-    if (c) {
-      mr /= c;
-      mg /= c;
-      mb /= c;
-      return Color((unsigned char) mr, (unsigned char) mg, (unsigned char) mb);
-    }
-    else { // no child had a color other than white
-      return Color(255, 255, 255);
-    }
+    val /= obs;
+    return Face(val,obs,fe);
   }
-  */
 
-  void TextureOcTreeNode::updateTextureFromChildren() {      
-    for (auto it = faces.begin(); it != faces.end(); it++)
-      if (it->nObs > 0) *it = getAverageChildTexture();
+  void TextureOcTreeNode::updateTextureChildren() {      
+    for (auto f : faces)
+      if (f.nObs > 0) f = getAverageChildTexture(f.fe);
   }
   
 
@@ -83,7 +73,7 @@ namespace octomap {
     // set occupancy value 
     setLogOdds(getChild(0)->getLogOdds());
     // set face textures to average child face textures 
-    updateTextureFromChildren();
+    updateTextureChildren();
     // delete children
     for (unsigned int i=0;i<8;i++) {
       delete children[i];
@@ -98,73 +88,41 @@ namespace octomap {
     for (unsigned int k=0; k<8; k++) {
       createChild(k);
       children[k]->setValue(value);
-      for (auto i :W 
-        getChild(k)->setFace(i,faces.at(i));
+      int i = 0;
+      for (auto f : faces) 
+      {
+        getChild(k)->setFace(static_cast<FaceEnum>(i),f);
+        i++;
+      }
     }
   }
 
 
-  /*
   // tree implementation  --------------------------------------
 
-  ColorOcTreeNode* ColorOcTree::setNodeColor(const OcTreeKey& key, 
-                                             const unsigned char& r, 
-                                             const unsigned char& g, 
-                                             const unsigned char& b) {
-    ColorOcTreeNode* n = search (key);
+  TextureOcTreeNode* TextureOcTree::setNodeTexture(const OcTreeKey& key, const FaceEnum& fe, 
+                                                   const Face& f) {
+    TextureOcTreeNode* n = search (key);
     if (n != 0) {
-      n->setColor(r, g, b); 
+      n->setFace(fe, f); 
     }
     return n;
   }
 
-  ColorOcTreeNode* ColorOcTree::averageNodeColor(const OcTreeKey& key, 
-                                                 const unsigned char& r, 
-                                                 const unsigned char& g, 
-                                                 const unsigned char& b) {
-    ColorOcTreeNode* n = search (key);
-    if (n != 0) {
-      if (n->isColorSet()) {
-        ColorOcTreeNode::Color prev_color = n->getColor();
-        n->setColor((prev_color.r + r)/2, (prev_color.g + g)/2, (prev_color.b + b)/2); 
-      }
-      else {
-        n->setColor(r, g, b);
-      }
+  TextureOcTreeNode* TextureOcTree::integrateFaceObservation(const OcTreeKey& key, const FaceEnum& fe, 
+                                                             const unsigned char& val) {
+    TextureOcTreeNode* n = search(key);
+    if (n!=0) {
+      n->addObservation(fe, val);
     }
     return n;
   }
 
-  ColorOcTreeNode* ColorOcTree::integrateNodeColor(const OcTreeKey& key, 
-                                                   const unsigned char& r, 
-                                                   const unsigned char& g, 
-                                                   const unsigned char& b) {
-    ColorOcTreeNode* n = search (key);
-    if (n != 0) {
-      if (n->isColorSet()) {
-        ColorOcTreeNode::Color prev_color = n->getColor();
-        double node_prob = n->getOccupancy();
-        unsigned char new_r = (unsigned char) ((double) prev_color.r * node_prob 
-                                               +  (double) r * (0.99-node_prob));
-        unsigned char new_g = (unsigned char) ((double) prev_color.g * node_prob 
-                                               +  (double) g * (0.99-node_prob));
-        unsigned char new_b = (unsigned char) ((double) prev_color.b * node_prob 
-                                               +  (double) b * (0.99-node_prob));
-        n->setColor(new_r, new_g, new_b); 
-      }
-      else {
-        n->setColor(r, g, b);
-      }
-    }
-    return n;
-  }
-  
-  
-  void ColorOcTree::updateInnerOccupancy() {
+  void TextureOcTree::updateInnerOccupancy() {
     this->updateInnerOccupancyRecurs(this->root, 0);
   }
 
-  void ColorOcTree::updateInnerOccupancyRecurs(ColorOcTreeNode* node, unsigned int depth) {
+  void TextureOcTree::updateInnerOccupancyRecurs(TextureOcTreeNode* node, unsigned int depth) {
     // only recurse and update for inner nodes:
     if (node->hasChildren()){
       // return early for last level:
@@ -176,61 +134,112 @@ namespace octomap {
         }
       }
       node->updateOccupancyChildren();
-      node->updateColorChildren();
+      node->updateTextureChildren();
     }
   }
 
-  void ColorOcTree::writeColorHistogram(std::string filename) {
+  void TextureOcTree::writeTextureHistogram(std::string filename) {
 
 #ifdef _MSC_VER
     fprintf(stderr, "The color histogram uses gnuplot, this is not supported under windows.\n");
 #else
-    // build RGB histogram
-    std::vector<int> histogram_r (256,0);
-    std::vector<int> histogram_g (256,0);
-    std::vector<int> histogram_b (256,0);
-    for(ColorOcTree::tree_iterator it = this->begin_tree(),
+    // build histograms for face textures
+    std::vector<int> histogram_xplus (256,0);
+    std::vector<int> histogram_xminus (256,0);
+    std::vector<int> histogram_yplus (256,0);
+    std::vector<int> histogram_yminus (256,0);
+    std::vector<int> histogram_zplus (256,0);
+    std::vector<int> histogram_zminus (256,0);
+    for(TextureOcTree::tree_iterator it = this->begin_tree(),
           end=this->end_tree(); it!= end; ++it) {
       if (!it.isLeaf() || !this->isNodeOccupied(*it)) continue;
-      ColorOcTreeNode::Color& c = it->getColor();
-      ++histogram_r[c.r];
-      ++histogram_g[c.g];
-      ++histogram_b[c.b];
+
+      ++histogram_xplus[it->getFaceValue(FaceEnum::xplus)];
+      ++histogram_xminus[it->getFaceValue(FaceEnum::xminus)];
+      ++histogram_yplus[it->getFaceValue(FaceEnum::yplus)];
+      ++histogram_yminus[it->getFaceValue(FaceEnum::yminus)];
+      ++histogram_zplus[it->getFaceValue(FaceEnum::zplus)];
+      ++histogram_zminus[it->getFaceValue(FaceEnum::zminus)];
     }
     // plot data
     FILE *gui = popen("gnuplot ", "w");
     fprintf(gui, "set term postscript eps enhanced color\n");
     fprintf(gui, "set output \"%s\"\n", filename.c_str());
     fprintf(gui, "plot [-1:256] ");
-    fprintf(gui,"'-' w filledcurve lt 1 lc 1 tit \"r\",");
-    fprintf(gui, "'-' w filledcurve lt 1 lc 2 tit \"g\",");
-    fprintf(gui, "'-' w filledcurve lt 1 lc 3 tit \"b\",");
+    fprintf(gui, "'-' w filledcurve lt 1 lc 1 tit \"+x\",");
+    fprintf(gui, "'-' w filledcurve lt 1 lc 2 tit \"-x\",");
+    fprintf(gui, "'-' w filledcurve lt 1 lc 3 tit \"+y\",");
+    fprintf(gui, "'-' w filledcurve lt 1 lc 4 tit \"-y\",");
+    fprintf(gui, "'-' w filledcurve lt 1 lc 5 tit \"+z\",");
+    fprintf(gui, "'-' w filledcurve lt 1 lc 6 tit \"-z\",");
     fprintf(gui, "'-' w l lt 1 lc 1 tit \"\",");
     fprintf(gui, "'-' w l lt 1 lc 2 tit \"\",");
-    fprintf(gui, "'-' w l lt 1 lc 3 tit \"\"\n");
+    fprintf(gui, "'-' w l lt 1 lc 3 tit \"\",");
+    fprintf(gui, "'-' w l lt 1 lc 4 tit \"\",");
+    fprintf(gui, "'-' w l lt 1 lc 5 tit \"\",");
+    fprintf(gui, "'-' w l lt 1 lc 6 tit \"\"\n");
 
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_r[i]);    
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xplus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_g[i]);    
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xminus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_b[i]);    
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yplus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_r[i]);    
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yminus[i]);    
+    fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zplus[i]);    
+    fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zminus[i]);    
+    fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
+
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xplus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_g[i]);    
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xminus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_b[i]);    
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yplus[i]);    
+    fprintf(gui, "e\n");
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yminus[i]);    
+    fprintf(gui, "e\n");
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zplus[i]);    
+    fprintf(gui, "e\n");
+    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zminus[i]);    
     fprintf(gui, "e\n");
     fflush(gui);
 #endif
   }
 
-  std::ostream& operator<<(std::ostream& out, ColorOcTreeNode::Color const& c) {
-    return out << '(' << (unsigned int)c.r << ' ' << (unsigned int)c.g << ' ' << (unsigned int)c.b << ')';
+
+  void TextureOcTree::insertPointCloud(const Pointcloud& scan, 
+                        const std::vector<unsigned char>& intensities,
+                        const octomap::point3d& sensor_origin,
+                        const octomath::Vector3& sensor_orientation, 
+                        double maxrange, bool lazy_eval, bool discretize)
+  {
+    // First update occupancies
+    OccupancyOcTreeStereo::insertPointCloud(scan,sensor_origin,sensor_orientation,maxrange,lazy_eval,discretize);
+    // For each point, compute the face that it intersects for the voxel it resides in
+    // and update that face's texture from the intensity at that point
+
+    // First, verify that we have the same number of intensities as points
+    if (scan.size() != intensities.size())
+      std::cerr << "Could not insert the point cloud: " << scan.size() << " points and " << intensities.size() << " intensities." << std::endl;
+
+  }
+    
+
+  std::ostream& operator<<(std::ostream& out, Face const& f) {
+    return out << '(' << (unsigned int)f.value << ' ' << (unsigned int)f.nObs << ')';
   }
 
+  std::ostream& operator<<(std::ostream& out, TextureOcTreeNode* n) {
+    return out << "+x : " << n->getFace(FaceEnum::xplus) << std::endl
+               << "-x : " << n->getFace(FaceEnum::xminus) << std::endl 
+               << "+y : " << n->getFace(FaceEnum::yplus) << std::endl
+               << "-y : " << n->getFace(FaceEnum::yminus) << std::endl
+               << "+z : " << n->getFace(FaceEnum::zplus) << std::endl
+               << "-z : " << n->getFace(FaceEnum::zminus) << std::endl;
+  }
 
-  ColorOcTree::StaticMemberInitializer ColorOcTree::colorOcTreeMemberInit;
-  */
+  TextureOcTree::StaticMemberInitializer TextureOcTree::textureOcTreeMemberInit;
 } // end namespace
 

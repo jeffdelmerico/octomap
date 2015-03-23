@@ -110,6 +110,25 @@ namespace octomap {
   }
 
   template <class NODE>
+  NODE* OccupancyOcTreeStereo<NODE>::updateNode(const point3d& p, bool occupied, float d) {
+    OcTreeKey key;
+    if(OccupancyOcTreeBase<NODE>::coordToKeyChecked(p,key))
+      return updateNode(key,occupied,d);
+    else 
+      return nullptr;
+  }
+
+  template <class NODE>
+  NODE* OccupancyOcTreeStereo<NODE>::updateNode(const float& x, const float& y, const float& z, 
+                                                bool occupied, float d) {
+    OcTreeKey key;
+    if(OccupancyOcTreeBase<NODE>::coordToKeyChecked(x,y,z,key))
+      return updateNode(key,occupied,d);
+    else
+      return nullptr;
+  }
+
+  template <class NODE>
   void OccupancyOcTreeStereo<NODE>::generateLUTs()
   {
     int levels = floor(maximum_range/this->resolution);

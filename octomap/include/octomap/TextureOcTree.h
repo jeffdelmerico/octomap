@@ -9,16 +9,29 @@
 
 namespace octomap {
   
+  // A few global utility functions
+  enum class FaceEnum {xplus=0, xminus, yplus, yminus, zplus, zminus};
+  inline FaceEnum operator++( FaceEnum& f ) { 
+    return f = (FaceEnum)(std::underlying_type<FaceEnum>::type(f) + 1); 
+  }
+
+  // user friendly output in format 
+  class Face;
+  class TextureOcTreeNode;
+  std::ostream& operator<<(std::ostream& out, Face const& f);
+  std::ostream& operator<<(std::ostream& out, TextureOcTreeNode* n);
+
+
   class Face {
   public:
-    Face() : value(0), nObs(0) {}
-    Face(unsigned char _value, unsigned int _nObs)
-      : value(_value), nObs(_nObs) {}
+    Face() : value(0), nObs(0), fe(FaceEnum::xplus) {}
+    Face(unsigned char _value, unsigned int _nObs, FaceEnum _fe)
+      : value(_value), nObs(_nObs), fe(_fe) {}
     inline bool operator== (const Face &other) const {
-      return (value == other.value && nObs == other.nObs);
+      return (value == other.value && nObs == other.nObs && fe == other.fe);
     }
     inline bool operator!= (const Face &other) const {
-      return (value!=other.value || nObs!=other.nObs);
+      return (value!=other.value || nObs!=other.nObs || fe!=other.fe);
     }
     inline void addObservation (unsigned char _v) {
       value = ((nObs*value) + _v)/(nObs+1);
@@ -26,14 +39,21 @@ namespace octomap {
     }
     unsigned char value; // mean intensity value
     unsigned int nObs; // number of observations in mean
+    FaceEnum fe; // Which face does this represent
   } ;
-
-  enum FaceEnum {xplus=0, xminus, yplus, yminus, zplus, zminus};
 
   // node definition
   class TextureOcTreeNode : public OcTreeNode {    
   public:
-    TextureOcTreeNode() : OcTreeNode() {}
+    TextureOcTreeNode() : OcTreeNode() 
+    {
+      FaceEnum fe = FaceEnum::xplus;
+      for(auto f : faces)
+      {
+        f = Face(0,0,fe);
+        ++fe;
+      }
+    }
 
     TextureOcTreeNode(const TextureOcTreeNode& rhs) : OcTreeNode(rhs), faces(rhs.faces) {}
 
@@ -58,18 +78,20 @@ namespace octomap {
     bool pruneNode();
     void expandNode();
     
-    inline unsigned char getFace(FaceEnum fe) const { return faces.at(fe).value; }
-    inline void addObservation(FaceEnum fe, unsigned char val) { faces.at(fe).addObservation(val); }
-    inline void setFace(FaceEnum fe, Face f) { faces.at(fe) = f; }
+    inline Face getFace(FaceEnum fe) const { return faces.at((int) fe); }
+    inline unsigned char getFaceValue(FaceEnum fe) const { return faces.at((int) fe).value; }
+    inline unsigned char getFaceObservations(FaceEnum fe) const { return faces.at((int) fe).nObs; }
+    inline void addObservation(FaceEnum fe, unsigned char val) { faces.at((int) fe).addObservation(val); }
+    inline void setFace(FaceEnum fe, Face f) { faces.at((int) fe) = f; }
 
     // have any observations been integrated?
     inline bool observed(FaceEnum fe) const { 
-      return (bool) faces.at(fe).nObs;
+      return (bool) faces.at((int) fe).nObs;
     }
 
-    void updateTextureFromChildren();
+    void updateTextureChildren();
 
-    Face getAverageChildTexture() const;
+    Face getAverageChildTexture(FaceEnum fe) const;
   
     // file I/O
     std::istream& readValue (std::istream &s);
@@ -87,7 +109,7 @@ namespace octomap {
     /// Default constructor, sets resolution of leafs
     TextureOcTree(double resolution, double coeff, double max_range) 
       : OccupancyOcTreeStereo<TextureOcTreeNode>(resolution,coeff,max_range) {};  
-    virtual ~TextureOcTree();
+    virtual ~TextureOcTree() {};
       
     /// virtual constructor: creates a new object of same type
     /// (Covariant return type requires an up-to-date compiler)
@@ -116,7 +138,7 @@ namespace octomap {
 
     // Look up a face texture
     unsigned char getNodeTexture(const OcTreeKey& key, const FaceEnum& fe) const {
-      return search(key).getFace(fe);
+      return search(key)->getFaceValue(fe);
     }
     unsigned char getNodeTexture(const float& x, const float& y, const float& z, const FaceEnum& fe) const {
       OcTreeKey key;
@@ -124,11 +146,30 @@ namespace octomap {
       return getNodeTexture(key, fe);
     }
 
-    // update inner nodes, sets color to average child color
+    // Print texture at a node to a stream
+    void printNodeTexture(const OcTreeKey& key) const {
+      TextureOcTreeNode* n = this->search(key);
+      std::cout << (TextureOcTreeNode *) n;
+    }
+    void printNodeTexture(const float& x, const float& y, const float& z) const {
+      OcTreeKey key;
+      if (!this->coordToKeyChecked(point3d(x,y,z), key)) return;
+      std::cout << "Texture at (" << x << ',' << y << ',' << z << ')' << std::endl;
+      printNodeTexture(key);
+    }
+
+    // update inner nodes, sets texture to average child texture
     void updateInnerOccupancy();
 
     // uses gnuplot to plot a RGB histogram in EPS format
     void writeTextureHistogram(std::string filename);
+
+    // Insert a cloud of points with intensities
+    void insertPointCloud(const Pointcloud& scan, 
+                          const std::vector<unsigned char>& intensities,
+                          const octomap::point3d& sensor_origin,
+                          const octomath::Vector3& sensor_orientation, 
+                          double maxrange, bool lazy_eval, bool discretize);
     
   protected:
     void updateInnerOccupancyRecurs(TextureOcTreeNode* node, unsigned int depth);
@@ -148,9 +189,6 @@ namespace octomap {
     static StaticMemberInitializer textureOcTreeMemberInit;
 
   };
-
-  //! user friendly output in format (xplus xminus yplus yminus zplus zminus)
-  std::ostream& operator<<(std::ostream& out, Face const& f);
 
 } // end namespace
 

@@ -11,12 +11,32 @@ int main(int argc, char** argv) {
   //##############################################################     
 
   TextureOcTree tree (0.1, 10.0, 15.0);
-  point3d origin (0.0f, 0.0f, 0.0f);
-  Face f1(127, 1);
-  Face f2(255, 2);
-  tree.setNodeTexture(1.0,1.0,1.0,FaceEnum::xplus,f1);
-  tree.setNodeTexture(1.0,1.0,1.0,FaceEnum::yplus,f2);
+  float x(1.0f), y(1.0f), z(1.0f);
+  float d(1.0f);
+  //point3d origin (0.0f, 0.0f, 0.0f);
+  
+  // Add an occupancy observation
+  TextureOcTreeNode* n = tree.updateNode(x,y,z, true, d); 
+  // Print texture from node pointer
+  cout << n << endl;
 
+  // Set some textures for the faces of that voxel
+  Face f1(127, 1, FaceEnum::xplus);
+  Face f2(255, 2, FaceEnum::yplus);
+  tree.setNodeTexture(x,y,z,FaceEnum::xplus,f1);
+  tree.setNodeTexture(x,y,z,FaceEnum::yplus,f2);
+  // Print texture from tree lookup
+  tree.printNodeTexture(x,y,z);
+
+  // Integrate some new texture observations
+  tree.integrateFaceObservation(x,y,z,FaceEnum::xplus,200);
+  tree.integrateFaceObservation(x,y,z,FaceEnum::yplus,100);
+  tree.integrateFaceObservation(x,y,z,FaceEnum::zplus,200);
+  tree.integrateFaceObservation(x,y,z,FaceEnum::zplus,100);
+  tree.printNodeTexture(x,y,z);
+
+  // Write histogram plot
+  tree.writeTextureHistogram("texture_histogram.eps");
 
   /*
   cout << "generating spherical scan at " << origin << " ..." << endl;

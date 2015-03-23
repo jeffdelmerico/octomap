@@ -104,7 +104,8 @@ namespace octomap {
      * @return pointer to the updated NODE
      */
     virtual NODE* updateNode(const OcTreeKey& key, bool occupied, float d);
-
+    virtual NODE* updateNode(const point3d& p, bool occupied, float d);
+    virtual NODE* updateNode(const float& x, const float& y, const float& z, bool occupied, float d);
 
     inline double getCoeff() const { return coefficient; }
     inline double getMaxRange() const { return maximum_range; }
