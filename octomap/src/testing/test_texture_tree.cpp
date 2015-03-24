@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
   tree.integrateFaceObservation(x,y,z,FaceEnum::zplus,100);
   tree.printNodeTexture(x,y,z);
 
+  /*
   cout << "generating spherical scan at " << origin << " ..." << endl;
   point3d point_on_surface (4.01f, 0.01f, 0.01f);
 
@@ -54,11 +55,11 @@ int main(int argc, char** argv) {
       unsigned char intensity = 100 + floor((i+j)/2.0f);
       intensities.push_back(intensity);
     }
-  } 
+  }
+  */
 
   cout << "generating planar scan at " << origin << " ..." << endl;
 
-  /*
   Pointcloud cloud;
   vector<unsigned char> intensities;
 
@@ -70,7 +71,6 @@ int main(int argc, char** argv) {
       intensities.push_back(intensity);
     }
   }
-  */
 
   octomath::Vector3 orientation(1.0, 0.0, 0.0);
 
@@ -108,8 +108,10 @@ int main(int argc, char** argv) {
   tree.writeBinary("spherical_scan.bt");
   */
 
-  cout << "writing to texture_scan.bt..." << endl;
-  tree.writeBinary("texture_scan.bt");
+  //cout << "writing to texture_scan.bt..." << endl;
+  //tree.writeBinary("texture_scan.bt");
+  cout << "writing to texture_scan.ot..." << endl;
+  tree.write("texture_scan.ot");
 
   // Test timing for stereo OcTree
   OcTreeStereo stereoTree (0.1, 10.0, 15.0);
