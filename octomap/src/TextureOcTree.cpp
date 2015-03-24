@@ -179,30 +179,32 @@ namespace octomap {
     fprintf(gui, "'-' w l lt 1 lc 5 tit \"\",");
     fprintf(gui, "'-' w l lt 1 lc 6 tit \"\"\n");
 
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xplus[i]);    
+    // Here we omit the zero bin, since this is the default value and will be
+    // large relative to the actually observed texture frequencies 
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xplus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xminus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xminus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yplus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yplus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yminus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yminus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zplus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zplus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zminus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zminus[i]);    
     fprintf(gui,"0 0\n"); fprintf(gui, "e\n");
 
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xplus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xplus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xminus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_xminus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yplus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yplus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yminus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_yminus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zplus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zplus[i]);    
     fprintf(gui, "e\n");
-    for (int i=0; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zminus[i]);    
+    for (int i=1; i<256; ++i) fprintf(gui,"%d %d\n", i, histogram_zminus[i]);    
     fprintf(gui, "e\n");
     fflush(gui);
 #endif
