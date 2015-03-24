@@ -28,6 +28,7 @@
 
 #include <octovis/ViewerGui.h>
 #include <octovis/ColorOcTreeDrawer.h>
+#include <octovis/TextureOcTreeDrawer.h>
 #include <octomap/MapCollection.h>
 
 
@@ -188,6 +189,9 @@ void ViewerGui::addOctree(octomap::AbstractOcTree* tree, int id, octomap::pose6d
         }
         else if (dynamic_cast<ColorOcTree*>(tree)) {
           r->octree_drawer = new ColorOcTreeDrawer();
+        }
+        else if (dynamic_cast<TextureOcTree*>(tree)) {
+          r->octree_drawer = new TextureOcTreeDrawer();
         } else{
           OCTOMAP_ERROR("Could not create drawer for tree type %s\n", tree->getTreeType().c_str());
         }
@@ -212,6 +216,9 @@ void ViewerGui::addOctree(octomap::AbstractOcTree* tree, int id, octomap::pose6d
         }
         else if (dynamic_cast<ColorOcTree*>(tree)) {
           otr.octree_drawer = new ColorOcTreeDrawer();
+        } 
+        else if (dynamic_cast<TextureOcTree*>(tree)) {
+          otr.octree_drawer = new TextureOcTreeDrawer();
         } else{
           OCTOMAP_ERROR("Could not create drawer for tree type %s\n", tree->getTreeType().c_str());
         }
@@ -499,6 +506,12 @@ void ViewerGui::openOcTree(){
     if (tree->getTreeType() == "ColorOcTree"){
       // map color and height map share the same color array and QAction
       ui.actionHeight_map->setText ("Map color");  // rename QAction in Menu
+      this->on_actionHeight_map_toggled(true); // enable color view
+      ui.actionHeight_map->setChecked(true);
+    }
+    else if (tree->getTreeType() == "TextureOcTree"){
+      // map color and height map share the same color array and QAction
+      ui.actionHeight_map->setText ("Texture color");  // rename QAction in Menu
       this->on_actionHeight_map_toggled(true); // enable color view
       ui.actionHeight_map->setChecked(true);
     }
@@ -1080,6 +1093,9 @@ void ViewerGui::on_actionConvert_ml_tree_triggered(){
       }
       else if (dynamic_cast<OcTree*>(t)) {
         ((ColorOcTree*) t)->toMaxLikelihood();
+      }
+      else if (dynamic_cast<OcTree*>(t)) {
+        ((TextureOcTree*) t)->toMaxLikelihood();
       }
     }
     showInfo("Done.", true);

@@ -17,7 +17,7 @@ MESSAGE (STATUS "${PROJECT_NAME} building as ${CMAKE_BUILD_TYPE}")
 # COMPILER FLAGS
 IF (CMAKE_COMPILER_IS_GNUCC)
   SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-error ")
-  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-error ")
+  SET (CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -Wall -Wno-error ")
   SET (CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -DNDEBUG") #sse3 disabled for compatibility
 #  SET (CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -DNDEBUG -msse3 -mssse3")
   SET (CMAKE_CXX_FLAGS_DEBUG "-O0 -g")

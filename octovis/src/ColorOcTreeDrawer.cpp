@@ -94,9 +94,11 @@ namespace octomap {
         if (tree.isNodeOccupied(*it)){ // occupied voxels
           if (tree.isNodeAtThreshold(*it)) {
             idx_occupied_thres = generateCube(voxel, cube_template, idx_occupied_thres, &m_occupiedThresArray);
-            color_idx_occupied_thres =  setCubeColorRGBA(it->getColor().r, it->getColor().g, it->getColor().b, 
-                                                         (unsigned char) (it->getOccupancy() * 255.),
-                                                         color_idx_occupied_thres, &m_occupiedThresColorArray);
+            color_idx_occupied_thres = setCubeColorRGBA(it->getColor().r, it->getColor().g, 
+                                                        it->getColor().b, 
+                                                        (unsigned char) (it->getOccupancy() * 255.),
+                                                        color_idx_occupied_thres, 
+                                                        &m_occupiedThresColorArray);
           }
           else {
             idx_occupied = generateCube(voxel, cube_template, idx_occupied, &m_occupiedArray);
