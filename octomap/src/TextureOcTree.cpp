@@ -55,7 +55,15 @@ namespace octomap {
         obs += nObs;
       }
     }
-    val /= obs;
+    if (obs < 1)
+    {
+      val = 0;
+      obs = 0;
+    }
+    else 
+    {
+      val = floor((float) val/(float) obs);
+    }
     return Face(val,obs,fe);
   }
 
