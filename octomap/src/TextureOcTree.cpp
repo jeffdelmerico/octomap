@@ -220,6 +220,57 @@ namespace octomap {
 
 
   // point insertion  --------------------------------------
+  FaceEnum TextureOcTree::getIntersectionFace(const point3d& center,
+                                              const point3d& intersection)
+  {
+    float dmin = std::numeric_limits<float>::max();
+    FaceEnum fe;
+    float d = 0.0;
+    
+    // x+
+    d = fabs((center.x() + resolution/2.0) - intersection.x());
+    if( d < dmin )
+    {
+      dmin = d;
+      fe = FaceEnum::xplus;
+    }
+    // x-
+    d = fabs((center.x() - resolution/2.0) - intersection.x());
+    if( d < dmin )
+    {
+      dmin = d;
+      fe = FaceEnum::xminus;
+    }
+    // y+
+    d = fabs((center.y() + resolution/2.0) - intersection.y());
+    if( d < dmin )
+    {
+      dmin = d;
+      fe = FaceEnum::yplus;
+    }
+    // y-
+    d = fabs((center.y() - resolution/2.0) - intersection.y());
+    if( d < dmin )
+    {
+      dmin = d;
+      fe = FaceEnum::yminus;
+    }
+    // z+
+    d = fabs((center.z() + resolution/2.0) - intersection.z());
+    if( d < dmin )
+    {
+      dmin = d;
+      fe = FaceEnum::zplus;
+    }
+    // z-
+    d = fabs((center.z() - resolution/2.0) - intersection.z());
+    if( d < dmin )
+    {
+      dmin = d;
+      fe = FaceEnum::zminus;
+    }
+    return fe;
+  }
 
   void TextureOcTree::insertTexturePoint(const octomap::point3d& point,
                                          const unsigned char& intensity,
@@ -240,53 +291,7 @@ namespace octomap {
     // Add observation to side it hits first
     if(success)
     {
-      float dmin = std::numeric_limits<float>::max();
-      FaceEnum fe;
-      float d = 0.0;
-      
-      // x+
-      d = fabs((center.x() + resolution/2.0) - intersection.x());
-      if( d < dmin )
-      {
-        dmin = d;
-        fe = FaceEnum::xplus;
-      }
-      // x-
-      d = fabs((center.x() - resolution/2.0) - intersection.x());
-      if( d < dmin )
-      {
-        dmin = d;
-        fe = FaceEnum::xminus;
-      }
-      // y+
-      d = fabs((center.y() + resolution/2.0) - intersection.y());
-      if( d < dmin )
-      {
-        dmin = d;
-        fe = FaceEnum::yplus;
-      }
-      // y-
-      d = fabs((center.y() - resolution/2.0) - intersection.y());
-      if( d < dmin )
-      {
-        dmin = d;
-        fe = FaceEnum::yminus;
-      }
-      // z+
-      d = fabs((center.z() + resolution/2.0) - intersection.z());
-      if( d < dmin )
-      {
-        dmin = d;
-        fe = FaceEnum::zplus;
-      }
-      // z-
-      d = fabs((center.z() - resolution/2.0) - intersection.z());
-      if( d < dmin )
-      {
-        dmin = d;
-        fe = FaceEnum::zminus;
-      }
-      
+      FaceEnum fe = getIntersectionFace(center,intersection);
       integrateFaceObservation(key,fe,intensity);
     }
   }
@@ -320,6 +325,28 @@ namespace octomap {
       const point3d& p = scan[i];
       insertTexturePoint(p,intensities.at(i),sensor_origin);
     }
+  }
+
+  unsigned char TextureOcTree::getTexturePoint(const octomap::point3d& point,
+                                               const octomath::Vector3& direction,
+                                               const octomap::point3d& sensor_origin)
+  {
+    // Compute key for leaf voxel that point lies inside
+    OcTreeKey key;
+    if (!this->coordToKeyChecked(point, key)) 
+      return 255;
+    
+    // Compute intersection point with voxel    
+    point3d intersection;
+    bool success = this->getRayIntersection(sensor_origin,direction,point,intersection);
+    if(success)
+    {
+      FaceEnum fe = getIntersectionFace(point,intersection);
+      return getNodeTexture(key,fe);
+    }
+    else
+      return 0;
+
   }
     
 

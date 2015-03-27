@@ -178,6 +178,12 @@ namespace octomap {
                           const octomath::Vector3& sensor_orientation, 
                           double maxrange = -1.0f, bool lazy_eval = false, 
                           bool discretize = false);
+
+    FaceEnum getIntersectionFace(const point3d& center, const point3d& intersection);
+
+    unsigned char getTexturePoint(const octomap::point3d& point,
+                                  const octomath::Vector3& orientation,
+                                  const octomap::point3d& sensor_origin);
     
   protected:
     void updateInnerOccupancyRecurs(TextureOcTreeNode* node, unsigned int depth);
